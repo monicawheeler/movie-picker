@@ -118,21 +118,16 @@ CATEGORIES = [
         "examples": ["10 Cloverfield Lane", "Buried", "The Platform"]
     }
 ]
-
 def get_db_connection():
-    """Connects to Google Sheets using Env Vars (Prod) or local file (Dev)."""
     if os.environ.get("GOOGLE_CREDENTIALS"):
         creds_dict = json.loads(os.environ.get("GOOGLE_CREDENTIALS"))
         gc = gspread.service_account_from_dict(creds_dict)
     else:
         gc = gspread.service_account(filename=SERVICE_ACCOUNT_FILE)
-        
-    sh = gc.open(SHEET_NAME)
-    return sh.worksheet(WORKSHEET_NAME)
+    return gc.open(SHEET_NAME).worksheet(WORKSHEET_NAME)
 
 @app.route('/')
 def home():
-    """Serves the main HTML page."""
     return render_template('index.html', categories=CATEGORIES)
 
 @app.route('/get-status', methods=['GET'])
@@ -141,18 +136,36 @@ def get_status():
         ws = get_db_connection()
         records = ws.get_all_records()
         
-        if not records:
-            current_turn = USER_A 
-        else:
-            last_picker = records[-1].get('Picker_Name')
-            current_turn = USER_B if last_picker == USER_A else USER_A
+        # Default State
+        current_turn = USER_A
+        app_state = "ready" # ready | pending
+        pending_category = ""
 
-        history = records[-3:]
+        if records:
+            last_row = records[-1]
+            last_picker = last_row.get('Picker_Name')
+            last_movie = last_row.get('Movie_Title')
+            last_category = last_row.get('Category')
+
+            # CHECK: Is the last pick unfinished?
+            if last_movie == "PENDING":
+                app_state = "pending"
+                current_turn = last_picker
+                pending_category = last_category
+            else:
+                # Normal turn rotation
+                current_turn = USER_B if last_picker == USER_A else USER_A
+
+        # Get history (Filter out the pending row if it exists)
+        history = [r for r in records if r.get('Movie_Title') != "PENDING"]
+        history = history[-3:]
         history.reverse()
 
         return jsonify({
             "status": "success",
             "current_turn": current_turn,
+            "app_state": app_state,
+            "pending_category": pending_category,
             "history": history
         })
     except Exception as e:
@@ -163,20 +176,42 @@ def save_pick():
     try:
         data = request.json
         ws = get_db_connection()
-        now = datetime.datetime.now()
+        action_type = data.get('type') # 'initial' or 'final'
         
-        row_data = [
-            now.strftime("%Y-%m-%d %H:%M:%S"),
-            now.strftime("%B"),
-            now.strftime("%Y"),
-            data.get('picker'),
-            data.get('category'),
-            data.get('movie_title'),
-            data.get('imdb_link', '')
-        ]
-        
-        ws.append_row(row_data)
-        return jsonify({"status": "success", "message": "Movie locked in!"})
+        if action_type == 'initial':
+            # STEP 1: Save Category, set Title to PENDING
+            now = datetime.datetime.now()
+            row_data = [
+                now.strftime("%Y-%m-%d %H:%M:%S"),
+                now.strftime("%B"),
+                now.strftime("%Y"),
+                data.get('picker'),
+                data.get('category'),
+                "PENDING",  # Movie Title
+                ""          # Link
+            ]
+            ws.append_row(row_data)
+            return jsonify({"status": "success", "message": "Category saved! Take your time choosing."})
+
+        elif action_type == 'final':
+            # STEP 2: Find the PENDING row and update it
+            # We assume the pending row is the LAST row.
+            records = ws.get_all_records()
+            
+            # Row index calculation: 
+            # records length + 1 (header) is the last row index.
+            row_index = len(records) + 1 
+            
+            # Double check it is actually pending to be safe
+            if records[-1].get('Movie_Title') != "PENDING":
+                return jsonify({"status": "error", "message": "No pending pick found at the end of the sheet."}), 400
+
+            # Column F is Movie_Title (6), Column G is IMDb_Link (7)
+            ws.update_cell(row_index, 6, data.get('movie_title'))
+            ws.update_cell(row_index, 7, data.get('imdb_link'))
+            
+            return jsonify({"status": "success", "message": "Movie locked in!"})
+
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 

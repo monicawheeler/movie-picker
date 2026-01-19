@@ -14,13 +14,12 @@
     </header>
 
     <div id="status-bar" class="status-bar">
-        Loading status...
+        Loading...
     </div>
 
     <div class="generator-card">
         <div id="spin-section">
             <p class="subtitle">Roll the dice to get your category</p>
-            
             <div id="category-display" class="category-display">???</div>
             
             <div id="category-details" class="category-details hidden">
@@ -32,6 +31,8 @@
         </div>
 
         <div id="input-form" class="hidden">
+            <h3 id="form-header" style="margin-top:0;">Lock in your Choice</h3>
+            
             <div class="input-group">
                 <label>Category</label>
                 <input type="text" id="final-category" readonly>
@@ -47,21 +48,21 @@
                 <input type="url" id="imdb-link" placeholder="https://imdb.com/...">
             </div>
 
-            <button onclick="submitPick()">Lock it in 🔒</button>
-            <button class="secondary" onclick="resetView()">Cancel / Re-Spin</button>
+            <div id="btn-container">
+                </div>
         </div>
     </div>
 
     <div class="history-section">
         <h3>Recent Watches</h3>
-        <table id="history-table">
-            </table>
+        <table id="history-table"></table>
     </div>
 </div>
 
 <script>
     const categories = {{ categories | tojson }};
     let currentUser = "";
+    let appState = "ready"; // 'ready' or 'pending'
 
     async function loadStatus() {
         try {
@@ -70,58 +71,68 @@
             
             if (data.status === 'success') {
                 currentUser = data.current_turn;
-                document.getElementById('status-bar').innerHTML = 
-                    `It is <strong>${currentUser}'s</strong> turn to pick!`;
+                appState = data.app_state;
+                
                 renderHistory(data.history);
+
+                if (appState === 'pending') {
+                    // MODE: PENDING (Resume picking)
+                    document.getElementById('status-bar').innerHTML = 
+                        `It is <strong>${currentUser}'s</strong> turn to finish picking!`;
+                    
+                    // Hide spinner, show form immediately
+                    document.getElementById('spin-section').classList.add('hidden');
+                    document.getElementById('input-form').classList.remove('hidden');
+                    document.getElementById('final-category').value = data.pending_category;
+                    document.getElementById('form-header').innerText = "Finish your Selection";
+                    
+                    // Render "Finalize" button only
+                    document.getElementById('btn-container').innerHTML = `
+                        <button onclick="submitFinalPick()">Lock in Movie 🔒</button>
+                    `;
+                } else {
+                    // MODE: READY (Start fresh)
+                    document.getElementById('status-bar').innerHTML = 
+                        `It is <strong>${currentUser}'s</strong> turn to pick!`;
+                }
             }
         } catch (error) {
             console.error('Error fetching status:', error);
-            document.getElementById('status-bar').innerText = "Error connecting to sheet.";
+            document.getElementById('status-bar').innerText = "Error connecting.";
         }
     }
 
     function renderHistory(history) {
         const table = document.getElementById('history-table');
         table.innerHTML = ''; 
-
         if (history.length === 0) {
             table.innerHTML = '<tr><td colspan="2">No movies watched yet.</td></tr>';
             return;
         }
-
         history.forEach(row => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${row.Picker_Name}</td>
-                <td>
-                    ${row.Movie_Title} <br>
-                    <span style="font-size:0.8em; color:#888;">${row.Category}</span>
-                </td>
+                <td>${row.Movie_Title} <br> <span style="font-size:0.8em; color:#888;">${row.Category}</span></td>
             `;
             table.appendChild(tr);
         });
     }
 
-    // --- UPDATED SPIN LOGIC ---
+    // --- SPIN LOGIC ---
     function spinCategory() {
         const display = document.getElementById('category-display');
         const details = document.getElementById('category-details');
         const btn = document.getElementById('spin-btn');
         
-        // Reset UI state
         details.classList.add('hidden');
         btn.disabled = true;
 
         let counter = 0;
         let selectedCat = null;
-
         const interval = setInterval(() => {
-            // Pick random category object
             selectedCat = categories[Math.floor(Math.random() * categories.length)];
-            
-            // Only show the NAME during the spin
             display.innerText = selectedCat.name; 
-            
             counter++;
             if (counter > 15) { 
                 clearInterval(interval);
@@ -131,13 +142,9 @@
     }
 
     function revealDetails(categoryObj) {
-        // Show Description
         document.getElementById('cat-desc').innerText = categoryObj.desc;
-        
-        // Create Example Pills
         const examplesDiv = document.getElementById('cat-examples');
         examplesDiv.innerHTML = '<span class="examples-label">Examples:</span>';
-        
         categoryObj.examples.forEach(ex => {
             const pill = document.createElement('span');
             pill.className = 'pill';
@@ -145,52 +152,59 @@
             examplesDiv.appendChild(pill);
         });
 
-        // Reveal the section
         document.getElementById('category-details').classList.remove('hidden');
-
-        // Change button to "Select" logic
+        
+        // Show the "Choose This" button
         const btn = document.getElementById('spin-btn');
-        btn.innerText = "Use This Category →";
-        btn.onclick = () => finalizeSelection(categoryObj.name);
+        btn.innerText = "Select This Category →";
+        btn.onclick = () => showOptions(categoryObj.name);
         btn.disabled = false;
     }
 
-    function finalizeSelection(catName) {
+    // Step 2: User confirmed category. Show them choices.
+    function showOptions(catName) {
         document.getElementById('spin-section').classList.add('hidden');
         document.getElementById('input-form').classList.remove('hidden');
         document.getElementById('final-category').value = catName;
+        
+        // Render TWO buttons: "Save for Later" and "Fill Now"
+        document.getElementById('btn-container').innerHTML = `
+            <button onclick="saveCategoryOnly()" style="background-color:#333; margin-bottom:10px;">Save Category & Decide Later ⏳</button>
+            <button onclick="submitFinalPick()">Lock in Movie Now 🔒</button>
+            <button class="secondary" onclick="resetView()">Cancel / Re-Spin</button>
+        `;
     }
 
     function resetView() {
-        document.getElementById('spin-section').classList.remove('hidden');
-        document.getElementById('input-form').classList.add('hidden');
-        document.getElementById('category-details').classList.add('hidden');
-        
-        // Reset button
-        const btn = document.getElementById('spin-btn');
-        btn.innerText = "Spin for Category";
-        btn.onclick = spinCategory;
-        btn.disabled = false;
-        
-        document.getElementById('category-display').innerText = "???";
-        document.getElementById('movie-title').value = "";
-        document.getElementById('imdb-link').value = "";
+        location.reload(); // Simplest reset is a reload
     }
 
-    async function submitPick() {
+    // --- SUBMIT ACTIONS ---
+
+    // A. Save Category Only (Initial)
+    async function saveCategoryOnly() {
+        const payload = {
+            type: 'initial',
+            picker: currentUser,
+            category: document.getElementById('final-category').value
+        };
+        await sendData(payload);
+    }
+
+    // B. Save Full Movie (Final)
+    async function submitFinalPick() {
         const title = document.getElementById('movie-title').value;
-        if (!title) {
-            alert("Please enter a movie title!");
-            return;
-        }
+        if (!title) { alert("Please enter a movie title!"); return; }
 
         const payload = {
-            picker: currentUser,
-            category: document.getElementById('final-category').value,
+            type: 'final',
             movie_title: title,
             imdb_link: document.getElementById('imdb-link').value
         };
+        await sendData(payload);
+    }
 
+    async function sendData(payload) {
         try {
             const response = await fetch('/save-pick', {
                 method: 'POST',
@@ -198,12 +212,11 @@
                 body: JSON.stringify(payload)
             });
             const res = await response.json();
-            
             if (res.status === 'success') {
-                alert("Saved successfully!");
+                alert(res.message);
                 location.reload(); 
             } else {
-                alert("Error saving: " + res.message);
+                alert("Error: " + res.message);
             }
         } catch (error) {
             console.error(error);
