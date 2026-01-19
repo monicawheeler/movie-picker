@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Night Picker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🎬 Movie Night Picker</h1>
+    </header>
+
+    <div id="status-bar" class="status-bar">
+        Loading status...
+    </div>
+
+    <div class="generator-card">
+        <div id="spin-section">
+            <p style="color: var(--text-muted);">Roll the dice to get your category</p>
+            <div id="category-display" class="category-display">???</div>
+            <button id="spin-btn" onclick="spinCategory()">Spin for Category</button>
+        </div>
+
+        <div id="input-form" class="hidden">
+            <div class="input-group">
+                <label>Category</label>
+                <input type="text" id="final-category" readonly>
+            </div>
+            
+            <div class="input-group">
+                <label>Movie Title</label>
+                <input type="text" id="movie-title" placeholder="e.g. Pulp Fiction">
+            </div>
+
+            <div class="input-group">
+                <label>IMDb Link (Optional)</label>
+                <input type="url" id="imdb-link" placeholder="https://imdb.com/...">
+            </div>
+
+            <button onclick="submitPick()">Lock it in 🔒</button>
+            <button class="secondary" onclick="resetView()">Cancel / Re-Spin</button>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <h3>Recent Watches</h3>
+        <table id="history-table">
+            </table>
+    </div>
+</div>
+
+<script>
+    // Injected from Python
+    const categories = {{ categories | tojson }};
+    let currentUser = "";
+
+    // 1. Load Status on Page Load
+    async function loadStatus() {
+        try {
+            const response = await fetch('/get-status');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                currentUser = data.current_turn;
+                document.getElementById('status-bar').innerHTML = 
+                    `It is <strong>${currentUser}'s</strong> turn to pick!`;
+                
+                renderHistory(data.history);
+            }
+        } catch (error) {
+            console.error('Error fetching status:', error);
+            document.getElementById('status-bar').innerText = "Error connecting to sheet.";
+        }
+    }
+
+    // 2. Render History Table
+    function renderHistory(history) {
+        const table = document.getElementById('history-table');
+        table.innerHTML = ''; // Clear
+
+        if (history.length === 0) {
+            table.innerHTML = '<tr><td colspan="2">No movies watched yet.</td></tr>';
+            return;
+        }
+
+        history.forEach(row => {
+            // Note: gspread returns dicts based on headers
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.Picker_Name}</td>
+                <td>
+                    ${row.Movie_Title} <br>
+                    <span style="font-size:0.8em; color:#888;">${row.Category}</span>
+                </td>
+            `;
+            table.appendChild(tr);
+        });
+    }
+
+    // 3. Spin Logic
+    function spinCategory() {
+        const display = document.getElementById('category-display');
+        const btn = document.getElementById('spin-btn');
+        btn.disabled = true;
+
+        let counter = 0;
+        const interval = setInterval(() => {
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            display.innerText = randomCat;
+            counter++;
+            
+            if (counter > 15) { // Stop after 15 flashes
+                clearInterval(interval);
+                finalizeSpin(randomCat);
+            }
+        }, 100);
+    }
+
+    function finalizeSpin(category) {
+        document.getElementById('spin-section').classList.add('hidden');
+        document.getElementById('input-form').classList.remove('hidden');
+        document.getElementById('final-category').value = category;
+    }
+
+    // 4. Reset View
+    function resetView() {
+        document.getElementById('spin-section').classList.remove('hidden');
+        document.getElementById('input-form').classList.add('hidden');
+        document.getElementById('spin-btn').disabled = false;
+        document.getElementById('category-display').innerText = "???";
+        document.getElementById('movie-title').value = "";
+        document.getElementById('imdb-link').value = "";
+    }
+
+    // 5. Submit Logic
+    async function submitPick() {
+        const title = document.getElementById('movie-title').value;
+        if (!title) {
+            alert("Please enter a movie title!");
+            return;
+        }
+
+        const payload = {
+            picker: currentUser,
+            category: document.getElementById('final-category').value,
+            movie_title: title,
+            imdb_link: document.getElementById('imdb-link').value
+        };
+
+        try {
+            const response = await fetch('/save-pick', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const res = await response.json();
+            
+            if (res.status === 'success') {
+                alert("Saved successfully!");
+                location.reload(); // Reload to update status and history
+            } else {
+                alert("Error saving: " + res.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Network error.");
+        }
+    }
+
+    // Initialize
+    loadStatus();
+</script>
+
+</body>
+</html>

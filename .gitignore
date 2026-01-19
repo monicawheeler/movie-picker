@@ -1,0 +1,32 @@
+# --- Security / Secrets (CRITICAL) ---
+# Never commit your private key!
+service_account.json
+credentials.json
+client_secret.json
+
+# Environment variables
+.env
+
+# --- Python ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Virtual Environments ---
+# Common names for virtual env folders
+venv/
+env/
+.venv/
+.env/
+
+# --- IDE / OS Files ---
+# Mac system files
+.DS_Store
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
