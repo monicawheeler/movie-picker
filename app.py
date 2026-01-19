@@ -2,6 +2,7 @@ import os
 import datetime
 from flask import Flask, render_template, request, jsonify
 import gspread
+import json
 
 app = Flask(__name__)
 
@@ -24,8 +25,18 @@ CATEGORIES = [
 ]
 
 def get_db_connection():
-    """Connects to Google Sheets and returns the worksheet object."""
-    gc = gspread.service_account(filename=SERVICE_ACCOUNT_FILE)
+    """Connects to Google Sheets using Env Vars or local file."""
+    
+    # Check if we are in production (Render)
+    if os.environ.get("GOOGLE_CREDENTIALS"):
+        creds_dict = json.loads(os.environ.get("GOOGLE_CREDENTIALS"))
+        # You need to authorize with the dict directly
+        # Note: gspread.service_account_from_dict is the specific method
+        gc = gspread.service_account_from_dict(creds_dict)
+    else:
+        # We are running locally
+        gc = gspread.service_account(filename=SERVICE_ACCOUNT_FILE)
+        
     sh = gc.open(SHEET_NAME)
     return sh.worksheet(WORKSHEET_NAME)
 
