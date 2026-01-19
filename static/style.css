@@ -3,8 +3,9 @@
     --card-bg: #1e1e1e;
     --text-main: #e0e0e0;
     --text-muted: #a0a0a0;
-    --accent: #bb86fc; /* Light Purple */
+    --accent: #bb86fc; 
     --accent-hover: #9f5fec;
+    --pill-bg: #333;
     --border-radius: 12px;
 }
 
@@ -21,13 +22,12 @@ body {
 
 .container {
     width: 100%;
-    max-width: 480px; /* Mobile width constraint */
+    max-width: 480px; 
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* Header & Status */
 header {
     text-align: center;
     margin-bottom: 10px;
@@ -63,14 +63,66 @@ h1 {
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
 .category-display {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     font-weight: bold;
-    margin: 20px 0;
-    min-height: 1.6em; /* Prevent jump */
+    margin: 20px 0 10px 0;
+    min-height: 1.4em; 
     color: var(--text-main);
 }
 
+/* NEW: Category Details */
+.category-details {
+    background-color: #252525;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #333;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.cat-desc {
+    font-style: italic;
+    color: var(--text-muted);
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+}
+
+.cat-examples {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.examples-label {
+    width: 100%;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.pill {
+    background-color: var(--pill-bg);
+    color: #ddd;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid #444;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Buttons */
 button {
     background-color: var(--accent);
     color: #000;
@@ -88,8 +140,13 @@ button:active {
     transform: scale(0.98);
 }
 
-button:hover {
+button:hover:not(:disabled) {
     background-color: var(--accent-hover);
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 button.secondary {
@@ -128,7 +185,7 @@ input:focus {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* History Table */

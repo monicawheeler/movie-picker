@@ -19,8 +19,15 @@
 
     <div class="generator-card">
         <div id="spin-section">
-            <p style="color: var(--text-muted);">Roll the dice to get your category</p>
+            <p class="subtitle">Roll the dice to get your category</p>
+            
             <div id="category-display" class="category-display">???</div>
+            
+            <div id="category-details" class="category-details hidden">
+                <p id="cat-desc" class="cat-desc"></p>
+                <div id="cat-examples" class="cat-examples"></div>
+            </div>
+
             <button id="spin-btn" onclick="spinCategory()">Spin for Category</button>
         </div>
 
@@ -53,11 +60,9 @@
 </div>
 
 <script>
-    // Injected from Python
     const categories = {{ categories | tojson }};
     let currentUser = "";
 
-    // 1. Load Status on Page Load
     async function loadStatus() {
         try {
             const response = await fetch('/get-status');
@@ -67,7 +72,6 @@
                 currentUser = data.current_turn;
                 document.getElementById('status-bar').innerHTML = 
                     `It is <strong>${currentUser}'s</strong> turn to pick!`;
-                
                 renderHistory(data.history);
             }
         } catch (error) {
@@ -76,10 +80,9 @@
         }
     }
 
-    // 2. Render History Table
     function renderHistory(history) {
         const table = document.getElementById('history-table');
-        table.innerHTML = ''; // Clear
+        table.innerHTML = ''; 
 
         if (history.length === 0) {
             table.innerHTML = '<tr><td colspan="2">No movies watched yet.</td></tr>';
@@ -87,7 +90,6 @@
         }
 
         history.forEach(row => {
-            // Note: gspread returns dicts based on headers
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${row.Picker_Name}</td>
@@ -100,42 +102,81 @@
         });
     }
 
-    // 3. Spin Logic
+    // --- UPDATED SPIN LOGIC ---
     function spinCategory() {
         const display = document.getElementById('category-display');
+        const details = document.getElementById('category-details');
         const btn = document.getElementById('spin-btn');
+        
+        // Reset UI state
+        details.classList.add('hidden');
         btn.disabled = true;
 
         let counter = 0;
+        let selectedCat = null;
+
         const interval = setInterval(() => {
-            const randomCat = categories[Math.floor(Math.random() * categories.length)];
-            display.innerText = randomCat;
-            counter++;
+            // Pick random category object
+            selectedCat = categories[Math.floor(Math.random() * categories.length)];
             
-            if (counter > 15) { // Stop after 15 flashes
+            // Only show the NAME during the spin
+            display.innerText = selectedCat.name; 
+            
+            counter++;
+            if (counter > 15) { 
                 clearInterval(interval);
-                finalizeSpin(randomCat);
+                revealDetails(selectedCat);
             }
         }, 100);
     }
 
-    function finalizeSpin(category) {
-        document.getElementById('spin-section').classList.add('hidden');
-        document.getElementById('input-form').classList.remove('hidden');
-        document.getElementById('final-category').value = category;
+    function revealDetails(categoryObj) {
+        // Show Description
+        document.getElementById('cat-desc').innerText = categoryObj.desc;
+        
+        // Create Example Pills
+        const examplesDiv = document.getElementById('cat-examples');
+        examplesDiv.innerHTML = '<span class="examples-label">Examples:</span>';
+        
+        categoryObj.examples.forEach(ex => {
+            const pill = document.createElement('span');
+            pill.className = 'pill';
+            pill.innerText = ex;
+            examplesDiv.appendChild(pill);
+        });
+
+        // Reveal the section
+        document.getElementById('category-details').classList.remove('hidden');
+
+        // Change button to "Select" logic
+        const btn = document.getElementById('spin-btn');
+        btn.innerText = "Use This Category →";
+        btn.onclick = () => finalizeSelection(categoryObj.name);
+        btn.disabled = false;
     }
 
-    // 4. Reset View
+    function finalizeSelection(catName) {
+        document.getElementById('spin-section').classList.add('hidden');
+        document.getElementById('input-form').classList.remove('hidden');
+        document.getElementById('final-category').value = catName;
+    }
+
     function resetView() {
         document.getElementById('spin-section').classList.remove('hidden');
         document.getElementById('input-form').classList.add('hidden');
-        document.getElementById('spin-btn').disabled = false;
+        document.getElementById('category-details').classList.add('hidden');
+        
+        // Reset button
+        const btn = document.getElementById('spin-btn');
+        btn.innerText = "Spin for Category";
+        btn.onclick = spinCategory;
+        btn.disabled = false;
+        
         document.getElementById('category-display').innerText = "???";
         document.getElementById('movie-title').value = "";
         document.getElementById('imdb-link').value = "";
     }
 
-    // 5. Submit Logic
     async function submitPick() {
         const title = document.getElementById('movie-title').value;
         if (!title) {
@@ -160,7 +201,7 @@
             
             if (res.status === 'success') {
                 alert("Saved successfully!");
-                location.reload(); // Reload to update status and history
+                location.reload(); 
             } else {
                 alert("Error saving: " + res.message);
             }
@@ -170,7 +211,6 @@
         }
     }
 
-    // Initialize
     loadStatus();
 </script>
 
