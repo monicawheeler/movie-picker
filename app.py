@@ -324,7 +324,30 @@ def get_db_connection():
 
 @app.route('/')
 def home():
-    return render_template('index.html', categories=CATEGORIES, user_a=USER_A, user_b=USER_B)
+    try:
+        # 1. Fetch the log from the spreadsheet
+        ws = get_db_connection()
+        records = ws.get_all_records()
+        
+        # 2. Create a set of all category names that appear in the 'Category' column
+        #    (We use a set for faster lookups)
+        used_names = {row['Category'] for row in records if row.get('Category')}
+        
+    except Exception as e:
+        # Fallback: If DB fails, assume nothing is used so the app still loads
+        print(f"Error fetching used categories: {e}")
+        used_names = set()
+
+    # 3. Create a new list with the 'used' flag attached
+    categories_with_status = []
+    for cat in CATEGORIES:
+        new_cat = cat.copy() # Create a copy so we don't edit the global list
+        # Check if this category name exists in our 'used' set
+        new_cat['used'] = (cat['name'] in used_names)
+        categories_with_status.append(new_cat)
+
+    # 4. Pass this "smart" list to the frontend
+    return render_template('index.html', categories=categories_with_status, user_a=USER_A, user_b=USER_B)
 
 @app.route('/get-status', methods=['GET'])
 def get_status():
@@ -420,4 +443,4 @@ def save_pick():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=2828)

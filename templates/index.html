@@ -119,15 +119,28 @@
         const details = document.getElementById('category-details');
         const btn = document.getElementById('spin-btn');
         
+        // 1. Filter the list to find only UNUSED categories
+        const availableParams = categories.filter(c => !c.used);
+
+        // Safety check: What if you've watched everything?
+        if (availableParams.length === 0) {
+            alert("Wow! You have watched every single category! Time to add more to app.py?");
+            return;
+        }
+        
         details.classList.add('hidden');
         btn.disabled = true;
 
         let counter = 0;
         let selectedCat = null;
+        
         const interval = setInterval(() => {
-            selectedCat = categories[Math.floor(Math.random() * categories.length)];
+            // 2. ONLY pick from 'availableParams' (the unused ones)
+            selectedCat = availableParams[Math.floor(Math.random() * availableParams.length)];
+            
             display.innerText = selectedCat.name; 
             counter++;
+            
             if (counter > 15) { 
                 clearInterval(interval);
                 revealDetails(selectedCat);
