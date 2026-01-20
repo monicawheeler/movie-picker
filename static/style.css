@@ -22,12 +22,13 @@ body {
 
 .container {
     width: 100%;
-    max-width: 480px; 
+    max-width: 480px; /* Mobile width constraint */
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
+/* --- HEADER & STATUS --- */
 header {
     text-align: center;
     margin-bottom: 10px;
@@ -54,7 +55,7 @@ h1 {
     font-size: 1.1rem;
 }
 
-/* Generator Section */
+/* --- GENERATOR CARD --- */
 .generator-card {
     background-color: var(--card-bg);
     padding: 25px;
@@ -76,7 +77,7 @@ h1 {
     color: var(--text-main);
 }
 
-/* NEW: Category Details */
+/* Category Details (Pills & Desc) */
 .category-details {
     background-color: #252525;
     padding: 15px;
@@ -117,12 +118,64 @@ h1 {
     border: 1px solid #444;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+/* --- INPUT FORMS --- */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
 }
 
-/* Buttons */
+label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+/* New User Selection Boxes */
+.user-section {
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--accent);
+    text-align: left;
+}
+
+.user-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.link-input {
+    font-size: 0.85rem;
+    padding: 8px;
+    color: #bbb;
+    background-color: #222;
+    margin-bottom: 0;
+}
+
+/* --- BUTTONS --- */
 button {
     background-color: var(--accent);
     color: #000;
@@ -133,6 +186,7 @@ button {
     font-weight: 600;
     cursor: pointer;
     width: 100%;
+    margin-bottom: 10px;
     transition: transform 0.1s, background-color 0.2s;
 }
 
@@ -152,43 +206,22 @@ button:disabled {
 button.secondary {
     background-color: #333;
     color: #fff;
-    margin-top: 10px;
 }
 
-/* Form Section */
-.input-group {
-    margin-bottom: 15px;
-    text-align: left;
+button.text-btn { 
+    background: none; 
+    color: #888; 
+    font-size: 0.8rem; 
+    padding: 5px; 
+    margin-top: 5px;
 }
 
-label {
-    display: block;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 5px;
+button.text-btn:hover {
+    color: #fff;
+    background: none;
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    border-radius: 8px;
-    color: white;
-    font-size: 1rem;
-    box-sizing: border-box;
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--accent);
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* History Table */
+/* --- HISTORY TABLE --- */
 .history-section {
     margin-top: 20px;
 }
@@ -207,17 +240,30 @@ table {
 }
 
 td {
-    padding: 10px 0;
+    padding: 12px 0;
     border-bottom: 1px solid #333;
+    vertical-align: top;
 }
 
-td:first-child {
+.history-cat {
+    width: 35%;
     color: var(--accent);
-    font-weight: 600;
-    width: 30%;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding-right: 10px;
 }
 
-td a {
-    color: var(--text-main);
-    text-decoration: none;
+.history-picks {
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* --- UTILITIES --- */
+.hidden {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }

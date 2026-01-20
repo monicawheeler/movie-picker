@@ -116,8 +116,204 @@ CATEGORIES = [
         "name": "Contained Pressure Cookers",
         "desc": "Small casts, limited settings, and maximum tension.",
         "examples": ["10 Cloverfield Lane", "Buried", "The Platform"]
+    },
+    {
+        "name": "Paranoia Thrillers",
+        "desc": "Everyone is lying, watched, or hiding something. Trust no one.",
+        "examples": ["The Thing", "Arlington Road", "The Parallax View"]
+    },
+    {
+        "name": "Tech Goes Wrong",
+        "desc": "Technology meant to help becomes the problem.",
+        "examples": ["Upgrade", "Eagle Eye", "Cam"]
+    },
+    {
+        "name": "Home Invasion (Serious)",
+        "desc": "High-tension home invasion stories without cheesy slasher vibes.",
+        "examples": ["Funny Games", "Hush", "The Strangers"]
+    },
+    {
+        "name": "Apocalypse Adjacent",
+        "desc": "The world is ending, just ended, or quietly falling apart.",
+        "examples": ["Children of Men", "The Road", "A Quiet Place"]
+    },
+    {
+        "name": "Single-Location Survival",
+        "desc": "One place, no escape, escalating tension.",
+        "examples": ["Phone Booth", "Devil", "Frozen"]
+    },
+    {
+        "name": "Man vs the System",
+        "desc": "One person pushed to the edge by institutions or bureaucracy.",
+        "examples": ["Brazil", "Dark Waters", "Snowpiercer"]
+    },
+    {
+        "name": "Cold & Isolated",
+        "desc": "Isolation plus brutal environments equals dread.",
+        "examples": ["The Thing", "The Lodge", "30 Days of Night"]
+    },
+    {
+        "name": "Urban Nightmares",
+        "desc": "Cities as hostile, dangerous ecosystems.",
+        "examples": ["Escape from New York", "Candyman", "The Warriors"]
+    },
+    {
+        "name": "Revenge, But Smart",
+        "desc": "Calculated, satisfying revenge without mindless brutality.",
+        "examples": ["Blue Ruin", "Oldboy", "I Saw the Devil"]
+    },
+    {
+        "name": "Time Is the Enemy",
+        "desc": "Deadlines, loops, or ticking clocks drive everything.",
+        "examples": ["Run Lola Run", "Source Code", "In Time"]
+    },
+    {
+        "name": "Hidden Cult Energy",
+        "desc": "Something is off, and it’s definitely a cult.",
+        "examples": ["The Invitation", "Midsommar", "Kill List"]
+    },
+    {
+        "name": "Psych Experiments Gone Wrong",
+        "desc": "People pushed past moral or mental limits.",
+        "examples": ["The Stanford Prison Experiment", "Exam", "The Platform"]
+    },
+    {
+        "name": "Neo-Noir Modern",
+        "desc": "Dark crime stories with modern polish.",
+        "examples": ["Prisoners", "Gone Girl", "Nightcrawler"]
+    },
+    {
+        "name": "One Person Against the Wild",
+        "desc": "Solo survival stories with real stakes.",
+        "examples": ["All Is Lost", "Arctic", "127 Hours"]
+    },
+    {
+        "name": "Disaster Escalation",
+        "desc": "Everything keeps getting worse in spectacular ways.",
+        "examples": ["Deepwater Horizon", "Greenland", "The Impossible"]
+    },
+    {
+        "name": "Twisted Family Dynamics",
+        "desc": "Families as the source of tension or horror.",
+        "examples": ["Hereditary", "The Killing of a Sacred Deer", "We Need to Talk About Kevin"]
+    },
+    {
+        "name": "Contained Sci-Fi Concepts",
+        "desc": "Small-scale sci-fi ideas executed tightly.",
+        "examples": ["Moon", "Primer", "Coherence"]
+    },
+    {
+        "name": "Lawless Places",
+        "desc": "Settings where rules don’t apply and danger reigns.",
+        "examples": ["Sicario", "No Country for Old Men", "Elite Squad"]
+    },
+    {
+        "name": "People Trapped Together",
+        "desc": "Forced proximity turns volatile fast.",
+        "examples": ["The Hateful Eight", "The Mist", "Cube"]
+    },
+    {
+        "name": "Unreliable Reality",
+        "desc": "You can’t trust what you’re seeing.",
+        "examples": ["Jacob’s Ladder", "Enemy", "Perfect Blue"]
+    },
+    {
+        "name": "Dark What-Ifs",
+        "desc": "One speculative idea taken seriously.",
+        "examples": ["The Purge", "The Lobster", "The Platform"]
+    },
+    {
+        "name": "Survival Horror Lite",
+        "desc": "Scary and tense without extreme gore.",
+        "examples": ["The Descent", "The Ruins", "As Above, So Below"]
+    },
+    {
+        "name": "Criminal Masterminds",
+        "desc": "Smart criminals executing bold plans.",
+        "examples": ["Heat", "Inside Man", "The Town"]
+    },
+    {
+        "name": "Escapes & Breakouts",
+        "desc": "Break free or die trying.",
+        "examples": ["The Shawshank Redemption", "Escape from Alcatraz", "Papillon"]
+    },
+    {
+        "name": "Nature Is Angry",
+        "desc": "Animals or environments turning lethal.",
+        "examples": ["Backcountry", "The Edge", "Crawl"]
+    },
+    {
+        "name": "Claustrophobic Horror",
+        "desc": "Tight spaces amplify the fear.",
+        "examples": ["The Descent", "Buried", "The Cave"]
+    },
+    {
+        "name": "Conspiracy Thrillers",
+        "desc": "Layers of secrets and powerful enemies.",
+        "examples": ["Enemy of the State", "The Conversation", "Three Days of the Condor"]
+    },
+    {
+        "name": "Morality Under Pressure",
+        "desc": "Ethical choices with no good outcomes.",
+        "examples": ["Eye in the Sky", "Prisoners", "Gone Baby Gone"]
+    },
+    {
+        "name": "Strangers in Trouble",
+        "desc": "Ordinary people caught in extraordinary danger.",
+        "examples": ["Calibre", "Breakdown", "Judgment Night"]
+    },
+    {
+        "name": "Reality TV From Hell",
+        "desc": "Games, competitions, or shows with deadly stakes.",
+        "examples": ["Battle Royale", "The Running Man", "Circle"]
+    },
+    {
+        "name": "Psychological Survival",
+        "desc": "Endurance of the mind matters as much as the body.",
+        "examples": ["Black Swan", "The Lighthouse", "The Machinist"]
+    },
+    {
+        "name": "Slow-Burn Payoff",
+        "desc": "Patient storytelling with strong final acts.",
+        "examples": ["The Witch", "Take Shelter", "The Night House"]
+    },
+    {
+        "name": "Hostile Journeys",
+        "desc": "Travel becomes a nightmare.",
+        "examples": ["The Hitcher", "Calibre", "Wrong Turn"]
+    },
+    {
+        "name": "Rules-Based Horror",
+        "desc": "The horror follows clear but terrifying rules.",
+        "examples": ["It Follows", "A Quiet Place", "Smile"]
+    },
+    {
+        "name": "Contained Action",
+        "desc": "Action movies set in tight spaces.",
+        "examples": ["Dredd", "The Raid", "Snowpiercer"]
+    },
+    {
+        "name": "Manhunts",
+        "desc": "Someone is being hunted relentlessly.",
+        "examples": ["No Country for Old Men", "The Fugitive", "Hardcore Henry"]
+    },
+    {
+        "name": "Moral Gray Heroes",
+        "desc": "Protagonists doing bad things for understandable reasons.",
+        "examples": ["Sicario", "Drive", "A History of Violence"]
+    },
+    {
+        "name": "Contained Mysteries",
+        "desc": "Mysteries limited to one place or event.",
+        "examples": ["Identity", "Bad Times at the El Royale", "Devil"]
+    },
+    {
+        "name": "Late-Night Chaos",
+        "desc": "Movies that feel best watched after dark.",
+        "examples": ["After Hours", "Good Time", "Nightcrawler"]
     }
 ]
+
 def get_db_connection():
     if os.environ.get("GOOGLE_CREDENTIALS"):
         creds_dict = json.loads(os.environ.get("GOOGLE_CREDENTIALS"))
@@ -128,7 +324,7 @@ def get_db_connection():
 
 @app.route('/')
 def home():
-    return render_template('index.html', categories=CATEGORIES)
+    return render_template('index.html', categories=CATEGORIES, user_a=USER_A, user_b=USER_B)
 
 @app.route('/get-status', methods=['GET'])
 def get_status():
@@ -136,34 +332,24 @@ def get_status():
         ws = get_db_connection()
         records = ws.get_all_records()
         
-        # Default State
-        current_turn = USER_A
-        app_state = "ready" # ready | pending
+        app_state = "ready"
         pending_category = ""
 
+        # Check last row for "PENDING"
         if records:
             last_row = records[-1]
-            last_picker = last_row.get('Picker_Name')
-            last_movie = last_row.get('Movie_Title')
-            last_category = last_row.get('Category')
-
-            # CHECK: Is the last pick unfinished?
-            if last_movie == "PENDING":
+            # In the new sheet structure, check if picks are empty or marked PENDING
+            if last_row.get('User_A_Pick') == "PENDING":
                 app_state = "pending"
-                current_turn = last_picker
-                pending_category = last_category
-            else:
-                # Normal turn rotation
-                current_turn = USER_B if last_picker == USER_A else USER_A
+                pending_category = last_row.get('Category')
 
-        # Get history (Filter out the pending row if it exists)
-        history = [r for r in records if r.get('Movie_Title') != "PENDING"]
+        # Get history (Filter out pending)
+        history = [r for r in records if r.get('User_A_Pick') != "PENDING"]
         history = history[-3:]
         history.reverse()
 
         return jsonify({
             "status": "success",
-            "current_turn": current_turn,
             "app_state": app_state,
             "pending_category": pending_category,
             "history": history
@@ -176,41 +362,59 @@ def save_pick():
     try:
         data = request.json
         ws = get_db_connection()
-        action_type = data.get('type') # 'initial' or 'final'
+        action_type = data.get('type') 
         
+        # --- CASE 1: "Save for Later" (User clicked the hourglass button)
         if action_type == 'initial':
-            # STEP 1: Save Category, set Title to PENDING
             now = datetime.datetime.now()
             row_data = [
-                now.strftime("%Y-%m-%d %H:%M:%S"),
-                now.strftime("%B"),
-                now.strftime("%Y"),
-                data.get('picker'),
-                data.get('category'),
-                "PENDING",  # Movie Title
-                ""          # Link
+                now.strftime("%Y-%m-%d"), 
+                data.get('category'),     
+                "PENDING",                
+                "",                       
+                "PENDING",                
+                ""                        
             ]
             ws.append_row(row_data)
-            return jsonify({"status": "success", "message": "Category saved! Take your time choosing."})
+            return jsonify({"status": "success", "message": "Category saved! You can finish this later."})
 
+        # --- CASE 2: "Lock in Both Movies" (User clicked the lock button)
         elif action_type == 'final':
-            # STEP 2: Find the PENDING row and update it
-            # We assume the pending row is the LAST row.
             records = ws.get_all_records()
             
-            # Row index calculation: 
-            # records length + 1 (header) is the last row index.
-            row_index = len(records) + 1 
+            # 1. Determine if we are UPDATING a pending row or CREATING a new one
+            is_pending_update = False
             
-            # Double check it is actually pending to be safe
-            if records[-1].get('Movie_Title') != "PENDING":
-                return jsonify({"status": "error", "message": "No pending pick found at the end of the sheet."}), 400
-
-            # Column F is Movie_Title (6), Column G is IMDb_Link (7)
-            ws.update_cell(row_index, 6, data.get('movie_title'))
-            ws.update_cell(row_index, 7, data.get('imdb_link'))
+            # Check if records exist AND if the last one is marked PENDING
+            if records and records[-1].get('User_A_Pick') == "PENDING":
+                is_pending_update = True
             
-            return jsonify({"status": "success", "message": "Movie locked in!"})
+            if is_pending_update:
+                # --- UPDATE EXISTING ROW ---
+                row_index = len(records) + 1 
+                updates = [
+                    {'range': f'C{row_index}', 'values': [[data.get('user_a_title')]]},
+                    {'range': f'D{row_index}', 'values': [[data.get('user_a_link')]]},
+                    {'range': f'E{row_index}', 'values': [[data.get('user_b_title')]]},
+                    {'range': f'F{row_index}', 'values': [[data.get('user_b_link')]]},
+                ]
+                ws.batch_update(updates)
+                
+            else:
+                # --- CREATE NEW COMPLETE ROW ---
+                # This handles the "Spin -> Immediate Save" flow
+                now = datetime.datetime.now()
+                row_data = [
+                    now.strftime("%Y-%m-%d"), 
+                    data.get('category'),  # Ensure JS sends this!
+                    data.get('user_a_title'),
+                    data.get('user_a_link'),
+                    data.get('user_b_title'),
+                    data.get('user_b_link')
+                ]
+                ws.append_row(row_data)
+            
+            return jsonify({"status": "success", "message": "Both movies locked in!"})
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

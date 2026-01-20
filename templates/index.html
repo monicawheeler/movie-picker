@@ -18,8 +18,9 @@
     </div>
 
     <div class="generator-card">
+        
         <div id="spin-section">
-            <p class="subtitle">Roll the dice to get your category</p>
+            <p class="subtitle">Roll the dice for a shared category</p>
             <div id="category-display" class="category-display">???</div>
             
             <div id="category-details" class="category-details hidden">
@@ -31,38 +32,40 @@
         </div>
 
         <div id="input-form" class="hidden">
-            <h3 id="form-header" style="margin-top:0;">Lock in your Choice</h3>
+            <h3 id="form-header" style="margin-top:0; text-align:center;">Make your Selections</h3>
             
             <div class="input-group">
-                <label>Category</label>
-                <input type="text" id="final-category" readonly>
+                <label>Selected Category</label>
+                <input type="text" id="final-category" readonly style="text-align:center; font-weight:bold; color:var(--accent);">
             </div>
             
-            <div class="input-group">
-                <label>Movie Title</label>
-                <input type="text" id="movie-title" placeholder="e.g. Pulp Fiction">
+            <div class="user-section">
+                <div class="user-label">{{ user_a }}'s Pick</div>
+                <input type="text" id="user-a-title" placeholder="Movie Title">
+                <input type="url" id="user-a-link" placeholder="IMDb Link (Optional)" class="link-input">
             </div>
 
-            <div class="input-group">
-                <label>IMDb Link (Optional)</label>
-                <input type="url" id="imdb-link" placeholder="https://imdb.com/...">
+            <div class="user-section">
+                <div class="user-label">{{ user_b }}'s Pick</div>
+                <input type="text" id="user-b-title" placeholder="Movie Title">
+                <input type="url" id="user-b-link" placeholder="IMDb Link (Optional)" class="link-input">
             </div>
 
-            <div id="btn-container">
-                </div>
+            <div id="btn-container"></div>
         </div>
     </div>
 
     <div class="history-section">
-        <h3>Recent Watches</h3>
+        <h3>Previous Rounds</h3>
         <table id="history-table"></table>
     </div>
 </div>
 
 <script>
     const categories = {{ categories | tojson }};
-    let currentUser = "";
-    let appState = "ready"; // 'ready' or 'pending'
+    const userAName = "{{ user_a }}";
+    const userBName = "{{ user_b }}";
+    let appState = "ready";
 
     async function loadStatus() {
         try {
@@ -70,35 +73,23 @@
             const data = await response.json();
             
             if (data.status === 'success') {
-                currentUser = data.current_turn;
                 appState = data.app_state;
-                
                 renderHistory(data.history);
 
                 if (appState === 'pending') {
-                    // MODE: PENDING (Resume picking)
-                    document.getElementById('status-bar').innerHTML = 
-                        `It is <strong>${currentUser}'s</strong> turn to finish picking!`;
+                    document.getElementById('status-bar').innerHTML = "Status: <strong>Waiting for Picks</strong>";
                     
-                    // Hide spinner, show form immediately
                     document.getElementById('spin-section').classList.add('hidden');
                     document.getElementById('input-form').classList.remove('hidden');
                     document.getElementById('final-category').value = data.pending_category;
-                    document.getElementById('form-header').innerText = "Finish your Selection";
                     
-                    // Render "Finalize" button only
-                    document.getElementById('btn-container').innerHTML = `
-                        <button onclick="submitFinalPick()">Lock in Movie 🔒</button>
-                    `;
+                    setupButtons(false); // False means show "Finalize" only
                 } else {
-                    // MODE: READY (Start fresh)
-                    document.getElementById('status-bar').innerHTML = 
-                        `It is <strong>${currentUser}'s</strong> turn to pick!`;
+                    document.getElementById('status-bar').innerHTML = "Status: <strong>Ready to Spin</strong>";
                 }
             }
         } catch (error) {
-            console.error('Error fetching status:', error);
-            document.getElementById('status-bar').innerText = "Error connecting.";
+            console.error(error);
         }
     }
 
@@ -106,14 +97,17 @@
         const table = document.getElementById('history-table');
         table.innerHTML = ''; 
         if (history.length === 0) {
-            table.innerHTML = '<tr><td colspan="2">No movies watched yet.</td></tr>';
+            table.innerHTML = '<tr><td colspan="2">No rounds yet.</td></tr>';
             return;
         }
         history.forEach(row => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${row.Picker_Name}</td>
-                <td>${row.Movie_Title} <br> <span style="font-size:0.8em; color:#888;">${row.Category}</span></td>
+                <td class="history-cat">${row.Category}</td>
+                <td class="history-picks">
+                    <div><strong>${userAName}:</strong> ${row.User_A_Pick}</div>
+                    <div><strong>${userBName}:</strong> ${row.User_B_Pick}</div>
+                </td>
             `;
             table.appendChild(tr);
         });
@@ -154,52 +148,58 @@
 
         document.getElementById('category-details').classList.remove('hidden');
         
-        // Show the "Choose This" button
         const btn = document.getElementById('spin-btn');
         btn.innerText = "Select This Category →";
         btn.onclick = () => showOptions(categoryObj.name);
         btn.disabled = false;
     }
 
-    // Step 2: User confirmed category. Show them choices.
     function showOptions(catName) {
         document.getElementById('spin-section').classList.add('hidden');
         document.getElementById('input-form').classList.remove('hidden');
         document.getElementById('final-category').value = catName;
-        
-        // Render TWO buttons: "Save for Later" and "Fill Now"
-        document.getElementById('btn-container').innerHTML = `
-            <button onclick="saveCategoryOnly()" style="background-color:#333; margin-bottom:10px;">Save Category & Decide Later ⏳</button>
-            <button onclick="submitFinalPick()">Lock in Movie Now 🔒</button>
-            <button class="secondary" onclick="resetView()">Cancel / Re-Spin</button>
-        `;
+        setupButtons(true);
     }
 
-    function resetView() {
-        location.reload(); // Simplest reset is a reload
+    function setupButtons(isNewSpin) {
+        const container = document.getElementById('btn-container');
+        if (isNewSpin) {
+            container.innerHTML = `
+                <button onclick="saveCategoryOnly()" class="secondary" style="margin-bottom:10px;">Save Category & Decide Later ⏳</button>
+                <button onclick="submitFinalPick()">Lock in Both Movies 🔒</button>
+                <button class="text-btn" onclick="location.reload()">Cancel</button>
+            `;
+        } else {
+            container.innerHTML = `<button onclick="submitFinalPick()">Lock in Both Movies 🔒</button>`;
+        }
     }
 
     // --- SUBMIT ACTIONS ---
-
-    // A. Save Category Only (Initial)
     async function saveCategoryOnly() {
         const payload = {
             type: 'initial',
-            picker: currentUser,
             category: document.getElementById('final-category').value
         };
         await sendData(payload);
     }
 
-    // B. Save Full Movie (Final)
     async function submitFinalPick() {
-        const title = document.getElementById('movie-title').value;
-        if (!title) { alert("Please enter a movie title!"); return; }
+        const titleA = document.getElementById('user-a-title').value;
+        const titleB = document.getElementById('user-b-title').value;
+        
+        if (!titleA || !titleB) { 
+            alert("Please enter a movie for BOTH people!"); 
+            return; 
+        }
 
         const payload = {
             type: 'final',
-            movie_title: title,
-            imdb_link: document.getElementById('imdb-link').value
+            // ADD THIS LINE BELOW:
+            category: document.getElementById('final-category').value, 
+            user_a_title: titleA,
+            user_a_link: document.getElementById('user-a-link').value,
+            user_b_title: titleB,
+            user_b_link: document.getElementById('user-b-link').value
         };
         await sendData(payload);
     }
